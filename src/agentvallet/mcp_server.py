@@ -8,6 +8,7 @@ from typing import Any
 from mcp.server.mcpserver import MCPServer
 
 from .recorder import WorkRecorder
+from .router import SkillRouter
 from .skills import SkillRegistry
 
 
@@ -19,6 +20,7 @@ ARTIFACT_ROOT = DATA_DIR / "artifacts"
 mcp = MCPServer("AgentVallet")
 recorder = WorkRecorder(DB_PATH, ARTIFACT_ROOT)
 registry = SkillRegistry(SKILLS_DIR)
+router = SkillRouter(registry)
 
 
 def _current_run_id() -> str | None:
@@ -35,6 +37,8 @@ def system_status() -> dict[str, Any]:
         "skills_dir": str(SKILLS_DIR),
         "active_run_id": _current_run_id(),
         "skill_count": len(registry.list()),
+        "event_sourcing": True,
+        "skill_router": True,
     }
 
 
@@ -55,6 +59,12 @@ def list_skills(trusted_only: bool = False) -> list[dict[str, Any]]:
             }
         )
     return result
+
+
+@mcp.tool()
+def route_skill(goal: str, trusted_only: bool = True) -> dict[str, Any]:
+    """Route a goal to the best matching trusted local skill or recommend solving it as new work."""
+    return router.route(goal, trusted_only=trusted_only).to_dict()
 
 
 @mcp.tool()
@@ -123,17 +133,32 @@ def snapshot_artifact(path: str) -> dict[str, Any]:
 
 @mcp.tool()
 def finish_work(final_result: dict[str, Any] | None = None, approved: bool = False) -> dict[str, Any]:
-    """Finish the active run. Approval does not automatically make a skill trusted."""
+    """Finish the active run. At least one passing validation is required for success."""
     run = recorder.finish(final_result, approved=approved)
     return run.to_dict()
+
+
+@mcp.tool()
+def get_run_events(run_id: str) -> list[dict[str, Any]]:
+    """Return the immutable append-only event history for a run in sequence order."""
+    return recorder.history(run_id)
 
 
 @mcp.tool()
 def create_skill_candidate(run_id: str, name: str, version: str = "0.1.0") -> dict[str, Any]:
     """Create a portable candidate skill from a recorded run; candidate code remains non-trusted."""
     run = recorder.load(run_id)
+    if run.status != "success" or not run.approved:
+        return {
+            "created": False,
+            "reason": "Skill candidates require a validated successful run with human approval",
+            "run_id": run_id,
+            "status": run.status,
+            "approved": run.approved,
+        }
     package = registry.create_from_run(run.to_dict(), name, version=version)
     return {
+        "created": True,
         "name": package.name,
         "version": package.version,
         "status": package.manifest.get("status"),
@@ -159,13 +184,13 @@ def skills_resource() -> str:
 
 @mcp.prompt()
 def reuse_prior_work(goal: str) -> str:
-    """Guide an AI client to prefer validated prior skills before reasoning from zero."""
+    """Guide an AI client through skill-first execution and append-only recording."""
     return (
-        "You are using AgentVallet. For this goal, first call list_skills and inspect the most "
-        "relevant skill with get_skill. Prefer a trusted validated skill when available. If no "
-        "suitable skill exists, call start_work, perform the task, record observable important "
-        "actions/corrections/validations, finish_work, and only create a skill candidate after a "
-        "successful validated run. Goal: " + goal
+        "You are using AgentVallet. First call route_skill for the goal. If it returns "
+        "reuse_skill, inspect that skill with get_skill and follow its validated workflow. If it "
+        "returns solve_new, call start_work and solve the task. Record only useful observable "
+        "actions, human corrections and validations. Finish the run only after validation. Create "
+        "a skill candidate only from a successful human-approved run. Goal: " + goal
     )
 
 
