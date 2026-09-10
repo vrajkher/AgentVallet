@@ -39,6 +39,11 @@ def system_status() -> dict[str, Any]:
         "skill_count": len(registry.list()),
         "event_sourcing": True,
         "skill_router": True,
+        "transparent_mcp_recording": {
+            "available": True,
+            "mode": "optional_stdio_proxy",
+            "command": "agentvallet-mcp-proxy",
+        },
     }
 
 
@@ -62,9 +67,9 @@ def list_skills(trusted_only: bool = False) -> list[dict[str, Any]]:
 
 
 @mcp.tool()
-def route_skill(goal: str, trusted_only: bool = True) -> dict[str, Any]:
-    """Route a goal to the best matching trusted local skill or recommend solving it as new work."""
-    return router.route(goal, trusted_only=trusted_only).to_dict()
+def route_skill(goal: str, minimum_score: float = 0.35) -> dict[str, Any]:
+    """Route a goal to the best trusted reusable skill before solving from zero."""
+    return router.route(goal, minimum_score=minimum_score).to_dict()
 
 
 @mcp.tool()
@@ -133,32 +138,27 @@ def snapshot_artifact(path: str) -> dict[str, Any]:
 
 @mcp.tool()
 def finish_work(final_result: dict[str, Any] | None = None, approved: bool = False) -> dict[str, Any]:
-    """Finish the active run. At least one passing validation is required for success."""
+    """Finish the active run. Approval does not automatically make a skill trusted."""
     run = recorder.finish(final_result, approved=approved)
     return run.to_dict()
 
 
 @mcp.tool()
 def get_run_events(run_id: str) -> list[dict[str, Any]]:
-    """Return the immutable append-only event history for a run in sequence order."""
+    """Return the append-only event-sourced history for a work run."""
     return recorder.history(run_id)
 
 
 @mcp.tool()
 def create_skill_candidate(run_id: str, name: str, version: str = "0.1.0") -> dict[str, Any]:
-    """Create a portable candidate skill from a recorded run; candidate code remains non-trusted."""
+    """Create a portable candidate skill only from successful human-approved work."""
     run = recorder.load(run_id)
-    if run.status != "success" or not run.approved:
-        return {
-            "created": False,
-            "reason": "Skill candidates require a validated successful run with human approval",
-            "run_id": run_id,
-            "status": run.status,
-            "approved": run.approved,
-        }
+    if run.status != "success":
+        raise ValueError("Skill candidate requires a successful validated run")
+    if not run.approved:
+        raise ValueError("Skill candidate requires human approval")
     package = registry.create_from_run(run.to_dict(), name, version=version)
     return {
-        "created": True,
         "name": package.name,
         "version": package.version,
         "status": package.manifest.get("status"),
@@ -184,13 +184,15 @@ def skills_resource() -> str:
 
 @mcp.prompt()
 def reuse_prior_work(goal: str) -> str:
-    """Guide an AI client through skill-first execution and append-only recording."""
+    """Guide an AI client to prefer validated prior skills before reasoning from zero."""
     return (
-        "You are using AgentVallet. First call route_skill for the goal. If it returns "
-        "reuse_skill, inspect that skill with get_skill and follow its validated workflow. If it "
-        "returns solve_new, call start_work and solve the task. Record only useful observable "
-        "actions, human corrections and validations. Finish the run only after validation. Create "
-        "a skill candidate only from a successful human-approved run. Goal: " + goal
+        "You are using AgentVallet. For every substantive task, first call route_skill with the "
+        "goal. If it returns reuse_skill, inspect that skill with get_skill and prefer its trusted "
+        "validated workflow. Otherwise call start_work, perform the task, record important "
+        "observable actions/corrections/validations, finish_work, and only create a skill candidate "
+        "after a successful human-approved run. Transparent MCP proxy recording may be enabled for "
+        "downstream tool evidence, but it does not replace corrections, validation, or approval. "
+        "Goal: " + goal
     )
 
 
