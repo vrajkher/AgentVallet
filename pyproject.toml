@@ -19,6 +19,7 @@ dev = ["pytest>=8", "ruff>=0.6"]
 [project.scripts]
 agentvallet = "agentvallet.cli:main"
 agentvallet-mcp = "agentvallet.mcp_server:main"
+agentvallet-mcp-proxy = "agentvallet.mcp_proxy:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/agentvallet"]
