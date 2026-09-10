@@ -1,0 +1,33 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "agentvallet"
+version = "0.1.0"
+description = "Portable AI work, memory and skill brain"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "AgentVallet Contributors"}]
+dependencies = ["mcp>=2,<3"]
+
+[project.optional-dependencies]
+graph = ["graphiti-core>=0.18"]
+dev = ["pytest>=8", "ruff>=0.6"]
+
+[project.scripts]
+agentvallet = "agentvallet.cli:main"
+agentvallet-mcp = "agentvallet.mcp_server:main"
+agentvallet-mcp-proxy = "agentvallet.mcp_proxy:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/agentvallet"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
