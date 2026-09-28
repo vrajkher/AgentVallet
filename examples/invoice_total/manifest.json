@@ -1,0 +1,23 @@
+{
+  "content_hash": "82696ea120644273cf7fd7d6a7eda1f028004b2f281e6f02bfc21ad1bddadbe8",
+  "files": {
+    "README.md": "019125b7f5096f87b07171bca894987e4078c9444cacea86c3f261d19e74c847",
+    "corrections.md": "83d9413dfdc262c04a80651efec6089772714bc8999c94980c95a2c18328af55",
+    "examples/example_001.json": "25e4232445a2871e97eedcc4e8a5bbbfb6ed988693d62f8d106b05bab92ea3a2",
+    "examples/example_002.json": "d7e1bf442b03d07cb05aaa5dfbd7a3145094cd57df4ed421b83bf28bd9222815",
+    "examples/example_003.json": "5ce4a438857a887cab12ab20910eb042043a18d1fc9725c3c84de0921fb9da1b",
+    "exceptions.md": "a4502746714d1844bd609661b71d3642c357a2b3efceec0c9f21854879fe8114",
+    "inputs.schema.json": "34502ccc81b791eaed5cd29a1db165b65c0ed81d8b152dd1b0f172cc2b1455a4",
+    "outputs.schema.json": "8b705503d883d7a7136776382c7f55b50207c10c41d838556d655d17b8042b42",
+    "rules.json": "e9898da7e3ed45b733dff787441bbd8435e26212029006edbb53d035b90319b4",
+    "run.py": "dda2933bc0fbf26f4459bbee35371f2acdd86662cd3250f46ff12be54d034708",
+    "skill.yaml": "b233271c571e949cd532ba16490f48847bfe460f622572d7acdbcd780cf3fd97",
+    "tests/test_skill.py": "e4511f75de39b7c8d1247e4bf4afa3503526717c0e4441b72080047e21610c42",
+    "validate.py": "50fd310a27c3c59d8894302797c759df98a36909e96df635054b75b9569f0052",
+    "workflow.md": "3d39f6af25aafb265eb0f12d48ca1151c5a1357872067a8860d59be702100a24"
+  },
+  "generated_at": "2026-09-28T06:28:17+00:00",
+  "name": "invoice_total",
+  "spec_version": "1.0",
+  "version": "1.0.0"
+}

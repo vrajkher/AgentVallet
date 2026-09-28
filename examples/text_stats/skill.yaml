@@ -1,0 +1,23 @@
+name: text_stats
+version: 1.0.0
+description: Count characters, words and lines in text and report the most frequent
+  words.
+spec_version: '1.0'
+tags:
+- text
+- nlp
+- analysis
+triggers:
+- count words in text
+- text statistics
+- most frequent words
+entrypoint: run.py
+validator: validate.py
+runtime:
+  python: '>=3.11'
+permissions:
+  network: false
+  filesystem: workdir
+timeout_seconds: 60
+implementation: manual
+license: MIT

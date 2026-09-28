@@ -1,0 +1,34 @@
+{
+  "expected_output": {
+    "currency": "USD",
+    "lines": [
+      {
+        "amount": 39.98,
+        "sku": "A-1"
+      },
+      {
+        "amount": 5.5,
+        "sku": "B-7"
+      }
+    ],
+    "subtotal": 45.48,
+    "tax": 3.64,
+    "total": 49.12
+  },
+  "input": {
+    "currency": "USD",
+    "items": [
+      {
+        "qty": 2,
+        "sku": "A-1",
+        "unit_price": 19.99
+      },
+      {
+        "qty": 1,
+        "sku": "B-7",
+        "unit_price": 5.5
+      }
+    ],
+    "tax_rate": 0.08
+  }
+}

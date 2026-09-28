@@ -1,0 +1,25 @@
+{
+  "expected_output": {
+    "currency": "EUR",
+    "lines": [
+      {
+        "amount": 30.0,
+        "sku": "C-3"
+      }
+    ],
+    "subtotal": 30.0,
+    "tax": 6.0,
+    "total": 36.0
+  },
+  "input": {
+    "currency": "EUR",
+    "items": [
+      {
+        "qty": 3,
+        "sku": "C-3",
+        "unit_price": 10
+      }
+    ],
+    "tax_rate": 0.2
+  }
+}

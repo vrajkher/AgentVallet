@@ -1,0 +1,17 @@
+{
+  "expected_output": {
+    "chars": 23,
+    "lines": 2,
+    "top_words": [
+      {
+        "count": 2,
+        "word": "hello"
+      }
+    ],
+    "words": 4
+  },
+  "input": {
+    "text": "Hello world\nhello again",
+    "top": 1
+  }
+}

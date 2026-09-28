@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "currency": {
+      "type": "string"
+    },
+    "lines": {
+      "items": {
+        "properties": {
+          "amount": {
+            "type": "number"
+          },
+          "sku": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "amount",
+          "sku"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "subtotal": {
+      "type": "number"
+    },
+    "tax": {
+      "type": "number"
+    },
+    "total": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "currency",
+    "lines",
+    "subtotal",
+    "tax",
+    "total"
+  ],
+  "title": "invoice_total output",
+  "type": "object"
+}

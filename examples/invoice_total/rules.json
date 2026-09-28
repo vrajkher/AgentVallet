@@ -1,0 +1,39 @@
+{
+  "rules": [
+    {
+      "description": "subtotal equals the sum of line amounts",
+      "id": "subtotal_is_sum_of_lines",
+      "items_path": "lines[*].amount",
+      "path": "subtotal",
+      "severity": "error",
+      "source": "manual",
+      "tolerance": 0.01,
+      "type": "sum_equals"
+    },
+    {
+      "id": "total_non_negative",
+      "min": 0,
+      "path": "total",
+      "severity": "error",
+      "source": "manual",
+      "type": "range"
+    },
+    {
+      "id": "currency_passthrough",
+      "other_path": "currency",
+      "other_target": "input",
+      "path": "currency",
+      "severity": "error",
+      "source": "manual",
+      "type": "equals_path"
+    },
+    {
+      "id": "currency_iso",
+      "path": "currency",
+      "pattern": "^[A-Z]{3}$",
+      "severity": "error",
+      "source": "manual",
+      "type": "regex"
+    }
+  ]
+}
