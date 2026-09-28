@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "chars": {
+      "type": "integer"
+    },
+    "lines": {
+      "type": "integer"
+    },
+    "top_words": {
+      "items": {
+        "properties": {
+          "count": {
+            "type": "integer"
+          },
+          "word": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "count",
+          "word"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "words": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "chars",
+    "lines",
+    "top_words",
+    "words"
+  ],
+  "title": "text_stats output",
+  "type": "object"
+}

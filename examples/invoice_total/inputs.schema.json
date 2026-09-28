@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "currency": {
+      "pattern": "^[A-Z]{3}$",
+      "type": "string"
+    },
+    "items": {
+      "items": {
+        "properties": {
+          "qty": {
+            "exclusiveMinimum": 0,
+            "type": "number"
+          },
+          "sku": {
+            "type": "string"
+          },
+          "unit_price": {
+            "minimum": 0,
+            "type": "number"
+          }
+        },
+        "required": [
+          "sku",
+          "qty",
+          "unit_price"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "tax_rate": {
+      "maximum": 1,
+      "minimum": 0,
+      "type": "number"
+    }
+  },
+  "required": [
+    "currency",
+    "items"
+  ],
+  "title": "invoice_total input",
+  "type": "object"
+}

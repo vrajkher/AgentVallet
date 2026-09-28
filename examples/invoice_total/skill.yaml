@@ -1,0 +1,24 @@
+name: invoice_total
+version: 1.0.0
+description: Compute invoice line amounts, subtotal, tax and total with exact decimal
+  rounding.
+spec_version: '1.0'
+tags:
+- finance
+- invoice
+- accounting
+triggers:
+- calculate invoice total
+- compute tax and total for an invoice
+- sum invoice line items
+entrypoint: run.py
+validator: validate.py
+runtime:
+  python: '>=3.11'
+permissions:
+  network: false
+  filesystem: workdir
+timeout_seconds: 60
+implementation: manual
+author: AgentVallet examples
+license: MIT

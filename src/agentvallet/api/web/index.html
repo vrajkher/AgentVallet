@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AgentVallet</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%227%22 fill=%22%233b5bdb%22/%3E%3Cpath d=%22M9 10l7 13 7-13%22 stroke=%22white%22 stroke-width=%223%22 fill=%22none%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/%3E%3C/svg%3E">
+<style>
+:root {
+  --bg: #f6f7f9; --panel: #ffffff; --text: #1b1f24; --muted: #5f6b7a; --line: #e3e7ec;
+  --accent: #3b5bdb; --accent-soft: #e7ecff; --ok: #1f8a4c; --ok-soft: #e3f5ea;
+  --bad: #c92a2a; --bad-soft: #fde8e8; --warn: #b7791f; --warn-soft: #fdf3e1;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f1216; --panel: #171b21; --text: #e6e9ee; --muted: #93a0b0; --line: #262c35;
+    --accent: #7c95ff; --accent-soft: #1e2645; --ok: #4cc38a; --ok-soft: #13291e;
+    --bad: #ff7b7b; --bad-soft: #341717; --warn: #f0b75c; --warn-soft: #33270f;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text);
+  font: 14px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+header { display: flex; align-items: center; gap: 16px; padding: 12px 20px;
+  border-bottom: 1px solid var(--line); background: var(--panel); position: sticky; top: 0; z-index: 2; flex-wrap: wrap; }
+header h1 { font-size: 16px; margin: 0; letter-spacing: .2px; }
+header h1 span { color: var(--muted); font-weight: 400; }
+nav { display: flex; gap: 4px; flex-wrap: wrap; }
+nav button { background: none; border: 0; padding: 6px 12px; border-radius: 6px; color: var(--muted);
+  cursor: pointer; font: inherit; }
+nav button.active, nav button:hover { background: var(--accent-soft); color: var(--accent); }
+.tw { overflow-x: auto; border-radius: 10px; }
+.tw table { min-width: 560px; }
+main { max-width: 1200px; margin: 0 auto; padding: 20px 16px 60px; }
+.grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+.stat .v { font-size: 26px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.stat .l { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .5px; }
+h2 { font-size: 15px; margin: 22px 0 10px; }
+table { width: 100%; border-collapse: collapse; background: var(--panel); border: 1px solid var(--line);
+  border-radius: 10px; overflow: hidden; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 12px; color: var(--muted); font-weight: 500; }
+tr:last-child td { border-bottom: 0; }
+tr.click { cursor: pointer; } tr.click:hover td { background: var(--accent-soft); }
+.pill { display: inline-block; padding: 1px 8px; border-radius: 99px; font-size: 12px; }
+.pill.success, .pill.approved, .pill.passed, .pill.true { background: var(--ok-soft); color: var(--ok); }
+.pill.failed, .pill.false, .pill.needs_human, .pill.invalid_input, .pill.no_skill { background: var(--bad-soft); color: var(--bad); }
+.pill.running, .pill.draft, .pill.repaired { background: var(--warn-soft); color: var(--warn); }
+.pill.validated { background: var(--accent-soft); color: var(--accent); }
+.pill.deprecated { background: var(--line); color: var(--muted); }
+code, pre, .mono { font-family: var(--mono); font-size: 12.5px; }
+pre { background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px;
+  overflow: auto; max-height: 420px; margin: 6px 0; white-space: pre-wrap; word-break: break-word; }
+.row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.split { display: grid; grid-template-columns: 320px 1fr; gap: 16px; }
+@media (max-width: 800px) { .split { grid-template-columns: 1fr; } }
+input, textarea, select { font: inherit; color: var(--text); background: var(--panel);
+  border: 1px solid var(--line); border-radius: 6px; padding: 7px 9px; width: 100%; }
+textarea { font-family: var(--mono); font-size: 12.5px; min-height: 120px; }
+.btn { display: inline-block; text-decoration: none; }
+button.btn, a.btn { background: var(--accent); color: #fff; border: 0; padding: 7px 14px; border-radius: 6px;
+  cursor: pointer; font: inherit; white-space: nowrap; }
+.btn.ghost { background: none; color: var(--accent); border: 1px solid var(--line); }
+button.btn:disabled { opacity: .5; cursor: default; }
+.muted { color: var(--muted); } .small { font-size: 12px; }
+.check { display: flex; gap: 8px; padding: 3px 0; }
+.check .m { width: 16px; text-align: center; }
+.ok { color: var(--ok); } .bad { color: var(--bad); } .warn { color: var(--warn); }
+.list-item { padding: 8px 10px; border-radius: 6px; cursor: pointer; border: 1px solid transparent; }
+.list-item:hover, .list-item.active { background: var(--accent-soft); border-color: var(--line); }
+.empty { padding: 24px; text-align: center; color: var(--muted); }
+#toast { position: fixed; bottom: 16px; right: 16px; max-width: 420px; padding: 10px 14px; border-radius: 8px;
+  background: var(--text); color: var(--bg); display: none; z-index: 5; }
+.tabs2 { display: flex; gap: 6px; margin: 10px 0; flex-wrap: wrap; }
+.tabs2 button { font: inherit; font-size: 12px; background: var(--panel); border: 1px solid var(--line);
+  border-radius: 6px; padding: 3px 9px; cursor: pointer; color: var(--muted); }
+.tabs2 button.active { color: var(--accent); border-color: var(--accent); }
+.flow { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; color: var(--muted); font-size: 12px; }
+.flow b { color: var(--text); font-weight: 500; background: var(--panel); border: 1px solid var(--line);
+  padding: 3px 8px; border-radius: 6px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>AgentVallet <span id="ver"></span></h1>
+  <nav id="nav">
+    <button data-view="overview" class="active">Overview</button>
+    <button data-view="runs">Runs</button>
+    <button data-view="skills">Skills</button>
+    <button data-view="playground">Playground</button>
+    <button data-view="audit">Audit</button>
+  </nav>
+</header>
+<main id="app"></main>
+<div id="toast"></div>
+<script>
+const $ = (s, el = document) => el.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const pill = s => `<span class="pill ${esc(s)}">${esc(s)}</span>`;
+const short = id => esc(String(id || "").slice(0, 8));
+const fmt = v => typeof v === "string" ? v : JSON.stringify(v, null, 2);
+let token = null;
+try { token = localStorage.getItem("av_token"); } catch (e) {}
+
+function toast(msg, ms = 3500) {
+  const t = $("#toast"); t.textContent = msg; t.style.display = "block";
+  clearTimeout(toast._t); toast._t = setTimeout(() => t.style.display = "none", ms);
+}
+
+async function api(path, opts = {}) {
+  const headers = {"Content-Type": "application/json", ...(token ? {Authorization: "Bearer " + token} : {})};
+  const res = await fetch(path, {...opts, headers: {...headers, ...(opts.headers || {})}});
+  if (res.status === 401) {
+    const t = prompt("API token required (AV_API_TOKEN):");
+    if (t) { token = t; try { localStorage.setItem("av_token", t); } catch (e) {} return api(path, opts); }
+  }
+  const ct = res.headers.get("content-type") || "";
+  const body = ct.includes("json") ? await res.json() : await res.text();
+  if (!res.ok) throw new Error(body.detail || body || res.statusText);
+  return body;
+}
+const post = (p, b) => api(p, {method: "POST", body: JSON.stringify(b || {})});
+
+const views = {
+  async overview() {
+    const s = await api("/api/stats");
+    $("#ver").textContent = "v" + s.version;
+    const runs = await api("/api/runs?limit=8");
+    const skills = await api("/api/skills");
+    return `
+      <div class="flow"><b>Goal</b>→<b>Record</b>→<b>Validate</b>→<b>Learn</b>→<b>Freeze as Skill</b>→<b>Reuse anywhere</b></div>
+      <h2>At a glance</h2>
+      <div class="grid">
+        ${stat(s.runs.total, "runs recorded")}${stat(s.runs.success, "successful runs")}
+        ${stat(s.skills.total, "skills")}${stat(s.skills.trusted, "trusted skills")}
+        ${stat(s.corrections.pending, "pending corrections")}${stat(s.graph.edges, "graph edges")}
+      </div>
+      <h2>Recent runs</h2>${runTable(runs)}
+      <h2>Skills</h2>${skillTable(skills)}
+      <p class="muted small">Home: <span class="mono">${esc(s.home)}</span> · LLM: ${esc(s.llm.provider)}
+        (${s.llm.available ? "ready" : "off"}) · Graph: ${esc(s.graph.backend)}</p>`;
+  },
+  async runs() {
+    const q = new URLSearchParams(location.hash.split("?")[1] || "");
+    const runs = await api("/api/runs?limit=200" + (q.get("status") ? "&status=" + q.get("status") : ""));
+    return `<div class="row"><input id="runSearch" placeholder="Filter by goal…" style="max-width:320px">
+      <select id="runStatus" style="max-width:160px"><option value="">all statuses</option>
+      <option>success</option><option>failed</option><option>running</option></select></div>
+      <div style="margin-top:12px" id="runTable">${runTable(runs)}</div>`;
+  },
+  async run(id) {
+    const d = await api("/api/runs/" + id);
+    const r = d.run;
+    return `<p><a href="#runs">← runs</a></p>
+      <h2>${esc(r.goal)} ${pill(r.status)}</h2>
+      <p class="muted small mono">${esc(r.id)} · agent ${esc(r.agent)} · ${esc(r.created_at)}
+        ${r.skill_name ? ` · skill <a href="#skills/${esc(r.skill_name)}">${esc(r.skill_name)}@${esc(r.skill_version)}</a>` : ""}</p>
+      <div class="tw"><table><tr><th>#</th><th>kind</th><th>content</th></tr>
+      ${d.steps.map(s => `<tr><td>${s.seq}</td><td>${pill(s.kind)}</td><td>
+        ${s.content ? `<pre>${esc(s.content)}</pre>` : ""}${s.data != null ? `<pre>${esc(fmt(s.data))}</pre>` : ""}
+        ${s.artifact_hash ? `<a class="small mono" href="/api/artifacts/${s.artifact_hash}" target="_blank">artifact ${short(s.artifact_hash)}</a>` : ""}
+      </td></tr>`).join("")}</table></div>
+      <h2>Correct this run</h2>
+      <div class="card"><textarea id="corrText" placeholder="What should have happened? (highest-priority learning signal)" style="min-height:70px"></textarea>
+      <div class="row" style="margin-top:8px"><input id="corrSkill" placeholder="skill name (optional)" value="${esc(r.skill_name || "")}" style="max-width:260px">
+      <button class="btn" id="corrBtn">Add correction</button></div>
+      ${d.corrections.map(c => `<p class="small">• ${esc(c.text)} <span class="muted">(${esc(c.author)}, ${c.applied_in ? "applied in " + esc(c.applied_in) : "pending"})</span></p>`).join("")}
+      </div>`;
+  },
+  async skills(name, version) {
+    const skills = await api("/api/skills");
+    let detail = `<div class="empty">Select a skill</div>`;
+    if (name) detail = await skillDetail(name, version);
+    else if (skills.length) { location.hash = "#skills/" + skills[0].name; return ""; }
+    return `<div class="row" style="justify-content:space-between"><span></span>
+      <button class="btn ghost" id="learnOpen">Learn a skill from runs…</button></div>
+      <div class="split" style="margin-top:12px">
+      <div class="card">${skills.length ? skills.map(s => `<div class="list-item ${s.name === name ? "active" : ""}" data-skill="${esc(s.name)}">
+        <b>${esc(s.name)}</b> ${s.trusted ? pill("approved") : pill(s.latest_status)}
+        <div class="small muted">${esc(s.description).slice(0, 80)}</div>
+        <div class="small muted">current ${esc(s.current || "–")} · latest ${esc(s.latest)} · ${s.versions} version(s)</div></div>`).join("")
+        : `<div class="empty">No skills yet. Record runs, then learn.</div>`}</div>
+      <div>${detail}</div></div>`;
+  },
+  async playground() {
+    return `<div class="card">
+      <label class="small muted">Task</label><input id="pgTask" placeholder="e.g. calculate the invoice total">
+      <label class="small muted" style="display:block;margin-top:8px">Input JSON</label>
+      <textarea id="pgInput">{}</textarea>
+      <div class="row" style="margin-top:8px">
+        <button class="btn ghost" id="pgRoute">Route</button><button class="btn" id="pgExec">Execute</button>
+        <label class="small"><input type="checkbox" id="pgDrafts" style="width:auto"> allow drafts</label></div>
+      </div><div id="pgOut"></div>`;
+  },
+  async audit() {
+    const v = await api("/api/audit/verify");
+    const entries = await api("/api/audit?limit=200");
+    return `<p>${v.ok ? '<span class="ok">✓</span>' : '<span class="bad">✗</span>'} ${esc(v.message)} (${v.entries} entries, hash-chained, append-only)</p>
+      <div class="tw"><table><tr><th>seq</th><th>time</th><th>actor</th><th>action</th><th>subject</th><th>details</th></tr>
+      ${entries.map(e => `<tr><td>${e.seq}</td><td class="small">${esc(e.ts)}</td><td>${esc(e.actor)}</td><td>${pill(e.action)}</td>
+        <td class="mono small">${esc(e.subject)}</td><td class="mono small">${esc(JSON.stringify(e.details)).slice(0, 160)}</td></tr>`).join("")}</table></div>`;
+  },
+};
+
+function stat(v, l) { return `<div class="card stat"><div class="v">${esc(v)}</div><div class="l">${esc(l)}</div></div>`; }
+function runTable(runs) {
+  if (!runs.length) return `<div class="card empty">No runs recorded yet. Use <code>av record start</code>, the API or MCP.</div>`;
+  return `<div class="tw"><table><tr><th>id</th><th>status</th><th>goal</th><th>skill</th><th>agent</th><th>created</th></tr>
+    ${runs.map(r => `<tr class="click" data-run="${esc(r.id)}"><td class="mono">${short(r.id)}</td><td>${pill(r.status)}</td>
+    <td>${esc(r.goal)}</td><td class="small">${r.skill_name ? esc(r.skill_name + "@" + r.skill_version) : ""}</td>
+    <td class="small">${esc(r.agent)}</td><td class="small muted">${esc(r.created_at)}</td></tr>`).join("")}</table></div>`;
+}
+function skillTable(skills) {
+  if (!skills.length) return `<div class="card empty">No skills yet.</div>`;
+  return `<div class="tw"><table><tr><th>skill</th><th>trusted version</th><th>latest</th><th>description</th></tr>
+    ${skills.map(s => `<tr class="click" data-skill="${esc(s.name)}"><td><b>${esc(s.name)}</b></td><td>${esc(s.current || "–")}</td>
+    <td>${esc(s.latest)} ${pill(s.latest_status)}</td><td class="muted">${esc(s.description)}</td></tr>`).join("")}</table></div>`;
+}
+function checksHtml(checks) {
+  return checks.map(c => `<div class="check"><span class="m ${c.passed ? "ok" : c.severity === "warning" ? "warn" : "bad"}">
+    ${c.passed ? "✓" : c.severity === "warning" ? "!" : "✗"}</span><span><span class="mono small">${esc(c.name)}</span>
+    <span class="muted small">${esc(c.message)}</span></span></div>`).join("");
+}
+async function skillDetail(name, version) {
+  const d = await api("/api/skills/" + encodeURIComponent(name) + (version ? "?version=" + version : ""));
+  const v = d.version, last = d.validations[0];
+  const files = d.files.filter(f => !f.startsWith("tests/"));
+  return `<div class="card">
+    <div class="row" style="justify-content:space-between"><h2 style="margin:0">${esc(v.name)} <span class="muted">@${esc(v.version)}</span> ${pill(v.status)}</h2>
+      <div class="row">
+        <button class="btn ghost" data-act="validate">Validate</button>
+        <button class="btn" data-act="approve" ${v.status === "approved" || v.status === "deprecated" ? "disabled" : ""}>Approve</button>
+        <a class="btn ghost" style="text-decoration:none" href="/api/skills/${esc(v.name)}/${esc(v.version)}/export">Export</a>
+      </div></div>
+    <p>${esc(v.description)}</p>
+    <p class="small muted">implementation: <b>${esc(d.meta.implementation || "manual")}</b> · hash <span class="mono">${short(v.content_hash)}</span>
+      ${v.approved_by ? ` · approved by <b>${esc(v.approved_by)}</b> ${esc(v.approved_at)}` : ""}</p>
+    <div class="tabs2">${d.versions.map(x => `<button data-ver="${esc(x.version)}" class="${x.version === v.version ? "active" : ""}">${esc(x.version)} · ${esc(x.status)}</button>`).join("")}</div>
+    ${d.versions.length > 1 ? `<div class="row small"><span class="muted">diff</span>
+      <select id="diffA" style="max-width:110px">${d.versions.map(x => `<option>${esc(x.version)}</option>`).join("")}</select>
+      <select id="diffB" style="max-width:110px">${d.versions.map(x => `<option ${x.version === v.version ? "selected" : ""}>${esc(x.version)}</option>`).join("")}</select>
+      <button class="btn ghost" id="diffBtn">Show diff</button></div><div id="diffOut"></div>` : ""}
+    <h2>Last validation ${last ? pill(last.passed ? "passed" : "failed") + ` <span class="muted small">score ${last.score}</span>` : ""}</h2>
+    <div id="valOut">${last ? checksHtml(last.report.checks || []) : '<span class="muted">not validated yet</span>'}</div>
+    <h2>Rules (${d.rules.length})</h2>
+    <div class="tw"><table><tr><th>id</th><th>type</th><th>path</th><th>source</th><th>severity</th></tr>
+      ${d.rules.map(r => `<tr><td class="mono small">${esc(r.id)}</td><td>${esc(r.type)}</td><td class="mono small">${esc(r.path || "")}</td>
+      <td>${pill(r.source || "manual")}</td><td class="small">${esc(r.severity || "error")}</td></tr>`).join("")}</table></div>
+    <h2>Files</h2><div class="tabs2">${files.map(f => `<button data-file="${esc(f)}">${esc(f)}</button>`).join("")}</div>
+    <pre id="fileOut" class="muted">select a file</pre>
+    ${d.corrections.length ? `<h2>Corrections</h2>${d.corrections.map(c => `<p class="small">• ${esc(c.text)} <span class="muted">(${c.applied_in ? "applied in " + esc(c.applied_in) : "pending — re-learn to apply"})</span></p>`).join("")}` : ""}
+    </div>`;
+}
+
+async function render() {
+  const [view, a, b] = (location.hash.slice(1).split("?")[0] || "overview").split("/");
+  document.querySelectorAll("#nav button").forEach(btn =>
+    btn.classList.toggle("active", btn.dataset.view === (view === "run" ? "runs" : view)));
+  const app = $("#app");
+  try {
+    const html = await (views[view] || views.overview)(a && decodeURIComponent(a), b);
+    if (html) app.innerHTML = html;
+  } catch (e) { app.innerHTML = `<div class="card bad">${esc(e.message)}</div>`; }
+}
+
+document.addEventListener("click", async e => {
+  const t = e.target.closest("[data-view],[data-run],[data-skill],[data-act],[data-ver],[data-file],#corrBtn,#pgRoute,#pgExec,#diffBtn,#learnOpen");
+  if (!t) return;
+  const [view, name, version] = location.hash.slice(1).split("/");
+  try {
+    if (t.dataset.view) location.hash = "#" + t.dataset.view;
+    else if (t.dataset.run) location.hash = "#run/" + t.dataset.run;
+    else if (t.dataset.skill) location.hash = "#skills/" + t.dataset.skill;
+    else if (t.dataset.ver) location.hash = `#skills/${name}/${t.dataset.ver}`;
+    else if (t.dataset.file) {
+      const v = $(".tabs2 button.active[data-ver]").dataset.ver;
+      $("#fileOut").textContent = await api(`/api/skills/${name}/${v}/files/${t.dataset.file}`);
+      $("#fileOut").classList.remove("muted");
+    } else if (t.dataset.act === "validate") {
+      const v = $(".tabs2 button.active[data-ver]").dataset.ver;
+      t.disabled = true; t.textContent = "Validating…";
+      const r = await post(`/api/skills/${name}/${v}/validate`);
+      toast(`${r.passed ? "PASSED" : "FAILED"} · score ${r.score}`); render();
+    } else if (t.dataset.act === "approve") {
+      const v = $(".tabs2 button.active[data-ver]").dataset.ver;
+      const who = prompt(`Approve ${name}@${v}. Your name:`);
+      if (!who) return;
+      await post(`/api/skills/${name}/${v}/approve`, {approver: who}); toast("approved"); render();
+    } else if (t.id === "diffBtn") {
+      const r = await api(`/api/skills/${name}/diff?a=${$("#diffA").value}&b=${$("#diffB").value}`);
+      $("#diffOut").innerHTML = `<pre>${esc(r.diff || "(no differences)")}</pre>`;
+    } else if (t.id === "corrBtn") {
+      const text = $("#corrText").value.trim(); if (!text) return;
+      await post("/api/corrections", {text, run_id: name, skill: $("#corrSkill").value || null});
+      toast("correction recorded"); render();
+    } else if (t.id === "learnOpen") {
+      const goal = prompt("Learn from successful runs whose goal is similar to:"); if (!goal) return;
+      const nm = prompt("Skill name (blank = derive from goal; existing = new version):") || null;
+      toast("learning…", 60000);
+      const r = await post("/api/learn", {goal, name: nm});
+      toast(`learned ${r.skill}@${r.version} via ${r.strategy} · validation ${r.validation.passed ? "passed" : "failed"}`);
+      location.hash = `#skills/${r.skill}/${r.version}`;
+    } else if (t.id === "pgRoute" || t.id === "pgExec") {
+      const task = $("#pgTask").value, drafts = $("#pgDrafts").checked;
+      if (t.id === "pgRoute") {
+        const m = await post("/api/route", {task, include_drafts: drafts});
+        $("#pgOut").innerHTML = `<h2>Candidates</h2>` + (m.length ? `<div class="tw"><table><tr><th>skill</th><th>version</th><th>score</th><th>why</th></tr>
+          ${m.map(x => `<tr><td>${esc(x.name)}</td><td>${esc(x.version)} ${pill(x.status)}</td><td>${x.score.toFixed(3)}</td><td class="small muted">${esc(x.reasons.join("; "))}</td></tr>`).join("")}</table></div>` : `<div class="card empty">no match</div>`);
+      } else {
+        let input; try { input = JSON.parse($("#pgInput").value); } catch (err) { return toast("invalid JSON input"); }
+        const r = await post("/api/execute", {task, input, include_drafts: drafts});
+        $("#pgOut").innerHTML = `<h2>${pill(r.status)} ${esc(r.skill || "")}${r.version ? "@" + esc(r.version) : ""}</h2>
+          ${r.run_id ? `<p class="small">run <a href="#run/${esc(r.run_id)}">${short(r.run_id)}</a></p>` : ""}
+          ${r.error ? `<div class="card bad">${esc(r.error)}</div>` : ""}
+          ${r.output != null ? `<pre>${esc(fmt(r.output))}</pre>` : ""}${checksHtml(r.checks)}
+          ${r.repair ? `<pre>${esc(fmt(r.repair))}</pre>` : ""}`;
+      }
+    }
+  } catch (err) { toast(err.message, 6000); }
+});
+document.addEventListener("input", e => {
+  if (e.target.id === "runSearch") {
+    const q = e.target.value.toLowerCase();
+    document.querySelectorAll("#runTable tr[data-run]").forEach(tr =>
+      tr.style.display = tr.textContent.toLowerCase().includes(q) ? "" : "none");
+  }
+});
+document.addEventListener("change", e => {
+  if (e.target.id === "runStatus") location.hash = "#runs" + (e.target.value ? "?status=" + e.target.value : "");
+});
+window.addEventListener("hashchange", render);
+render();
+</script>
+</body>
+</html>

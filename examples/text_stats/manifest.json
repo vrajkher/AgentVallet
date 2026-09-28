@@ -1,0 +1,22 @@
+{
+  "content_hash": "36fa435769ae1c56795aa4e96c90963fcb7d01d17e3f8e4d164d01bdadbaf82f",
+  "files": {
+    "README.md": "860a4dba17c6c7857eddb1551d8685f54677c3b203a5b196b4e34d74447b73b0",
+    "corrections.md": "f89c267e224d32bc1ed05499e0b7e30f0ab556055328b81480d75ebdd8d93c6f",
+    "examples/example_001.json": "28631eeeb0abf81a9435583b62b02701727e0fa56e17a26dd2da64757e9b5408",
+    "examples/example_002.json": "dfc937d696e872f81fe817923689d8b99bf325b06fb77ff08062ee2ef6b2c377",
+    "exceptions.md": "a48e4e2b303c1fdf3bab48898469e77f77c15acc77a60f65aa718554b31f630f",
+    "inputs.schema.json": "80e656ec1c7d4672b8d511f490dcf5bf4afa4e15bdb3bdb9adf4ab1ffa7261a5",
+    "outputs.schema.json": "c03307aaa60560c2f8f6cc9af356898c76b9588daf85afe084f18501d7cc94d9",
+    "rules.json": "abcf49ecf6c5d217ee5bb8db20e6f437aab4b330285d9ae82360759cb6a51ec0",
+    "run.py": "da9adc300a308065c0557d75ad8de4bb56974b9e6f654497640f433981474c47",
+    "skill.yaml": "be9e4f309d54c3cfa8fbfd24dceb0e7741e0925568c4bd053ececf42a2db8390",
+    "tests/test_skill.py": "e4511f75de39b7c8d1247e4bf4afa3503526717c0e4441b72080047e21610c42",
+    "validate.py": "5b3b424ad341e7e874acae15a3dffebd564a23a2e4dfb671d25598f7ff1bd52c",
+    "workflow.md": "b055442163e782cc51a15da13488e8cce8585aa14bf441cfc6f2cbc07a0048ea"
+  },
+  "generated_at": "2026-09-28T06:28:17+00:00",
+  "name": "text_stats",
+  "spec_version": "1.0",
+  "version": "1.0.0"
+}

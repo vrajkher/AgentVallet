@@ -1,0 +1,34 @@
+{
+  "expected_output": {
+    "currency": "INR",
+    "lines": [
+      {
+        "amount": 998.0,
+        "sku": "D-9"
+      },
+      {
+        "amount": 199.98,
+        "sku": "E-2"
+      }
+    ],
+    "subtotal": 1197.98,
+    "tax": 215.64,
+    "total": 1413.62
+  },
+  "input": {
+    "currency": "INR",
+    "items": [
+      {
+        "qty": 4,
+        "sku": "D-9",
+        "unit_price": 249.5
+      },
+      {
+        "qty": 2,
+        "sku": "E-2",
+        "unit_price": 99.99
+      }
+    ],
+    "tax_rate": 0.18
+  }
+}

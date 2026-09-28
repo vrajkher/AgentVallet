@@ -1,0 +1,20 @@
+{
+  "rules": [
+    {
+      "id": "words_non_negative",
+      "min": 0,
+      "path": "words",
+      "severity": "error",
+      "source": "manual",
+      "type": "range"
+    },
+    {
+      "id": "top_words_counts",
+      "min": 1,
+      "path": "top_words[*].count",
+      "severity": "error",
+      "source": "manual",
+      "type": "range"
+    }
+  ]
+}

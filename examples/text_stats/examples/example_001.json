@@ -1,0 +1,21 @@
+{
+  "expected_output": {
+    "chars": 19,
+    "lines": 1,
+    "top_words": [
+      {
+        "count": 2,
+        "word": "the"
+      },
+      {
+        "count": 1,
+        "word": "cat"
+      }
+    ],
+    "words": 5
+  },
+  "input": {
+    "text": "the cat and the hat",
+    "top": 2
+  }
+}
